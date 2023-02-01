@@ -7,11 +7,11 @@ public class Program {
     public static void main(String[] args) {
 
 
-        try (SignatureWorker sw = new SignatureWorker("src\\com\\day02\\ex00\\signatures.txt")) {
+        try (SignatureWorker sw = new SignatureWorker("src/com/day02/ex00/signatures.txt")) {
 
             String str;
             Scanner sc = new Scanner(System.in);
-            sw.openOutputFile("src\\com\\day02\\ex00\\result.txt");
+            sw.openOutputFile("src/com/day02/ex00/result.txt");
 
             while(true){
                 str = sc.nextLine();
