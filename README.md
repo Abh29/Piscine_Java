@@ -1,47 +1,44 @@
-# Module 01 â€“ Piscine Java
+# Module 06 â€“ Piscine Java
 
-## OOP/Collections
+## JUnit/Mockito
 
-Summary: Today you will learn how to model the operation of various collections
-correctly, and create a full-scale money transfer application
-
+Summary: Today you will learn the basics of module and integration testing
 
 ## Contents
 
 - I Foreword
 - II Instructions
-- III Introduction to exercises
-- IV Exercise 00 : Models
-- V Exercise 01 : ID Generator
-- VI Exercise 02 : List of Users
-- VII Exercise 03 : List of transactions
-- VIII Exercise 04 : Business Logic
-- IX Exercise 05 : Menu
+- III Rules of the Day
+- IV Exercise 00 : First Tests
+- V Exercise 01 : Embedded DataBase
+- VI Exercise 02 : Test for JDBC Repository
+- VII Exercise 03 : Test for Service
 
 
 # Chapter I
 
 # Foreword
 
-Domain modeling is the most challenging task in software development. Solving this task
-correctly ensures flexibility of the implemented system.
-Programming languages supporting the object-oriented programming (OOP) concept
-enable to effectively divide business processes into logical components called classes.
-Each class must comply with SOLID principles:
+Module and integration tests allow a programmer to ensure correct operation of programs
+they create. Those testing methods are performed automatically.
 
-- Single responsibility principle: a class contains a single logically associated func-
-    tionality (a coffee machine cannot clean and monitor changes in the call stack; its
-    purpose is to make coffee).
-- Open-closed principle: each class can offer an option to extend its functionality.
-    However, such extension should not provide for modifying source class code.
-- Liskov substitution principle: derived classes only ADD to the functionality of a
-    source class without modifying it.
-- Interface segregation principle: there are many points (interfaces) that describe a
-    logically associated behavior. There is no general-purpose interface.
-- Dependency inversion principle: a system must not depend on specific entities; all
-    dependencies are based on abstractions (interfaces).
+Thus, your goal is not just to write a correct code, but also create code to check the
+validity of your implementation.
 
-Today, you should focus on the first SOLID principle.
+Module tests in Java are classes that contain several testing methods for public methods
+of classes under test. Each module test class shall check the functionality of a single class
+only. Such tests allow to pinpoint errors accurately. To perform tests without specific
+dependencies, stub objects with temporary implementation are used.
+
+Unlike module tests, integration tests enable checking bundles of various components.
+
+Below are several best practices for module and integration testing:
+
+- Use adequate names for testing methods.
+- Consider different situations.
+- Ensure that tests cover at least 80% of code.
+- Each test method should contain a small portion of code and be executed quickly.
+- Test methods must be isolated from one another and have no side effects.
 
 
 # Chapter II
@@ -76,7 +73,7 @@ Today, you should focus on the first SOLID principle.
 - Use "System.out" for output
 
 
-Module 01 â€“ Piscine Java OOP/Collections
+Module 06 â€“ Piscine Java JUnit/Mockito
 
 - And may the Force be with you!
 - Never leave that till tomorrow which you can do today ;)
@@ -84,378 +81,344 @@ Module 01 â€“ Piscine Java OOP/Collections
 
 # Chapter III
 
-# Introduction to exercises
+# Rules of the Day
 
-An internal money transfer system is an integral part of many corporate applications.
-Your todayâ€™s task is to automate a business process associated with transfers of certain
-amounts between participants of our system.
-Each system user can transfer a certain amount to another user. We need to make sure
-that even if we lose the history of incoming and outgoing transfers for a specific user, we
-shall still be able to recover this information.
-Inside the system, all money transactions are stored in the form of debit/credit pairs.
-For example, John has transferred \$500 to Mike. System saves the transaction for both
-users:
-John -> Mike, -500, OUTCOME, transaction ID
-Mike -> John, +500, INCOME, transaction ID
-To recover the connection within such pairs, identifiers of each transaction should be
-used.
-A transfer entry may obviously be lost in such a complex systemit may not be recorded
-for one of the users (to emulate and debug such a situation, a developer needs to be able to
-remove the transfer data from one of users individually). Since such situations are realistic,
-functionality is required for displaying all "unacknowledged transfers" (transactions recorded
-for one user only) and resolving such issues.
-Below is a set of exercises you can do one by one to solve the task.
+- Use JUnit 5 framework in all tasks
+- Use the following dependencies and plugins to ensure correct operation:
+
+```
+â—¦ maven-surefire-plugin
+```
+```
+â—¦ junit-jupiter-engine
+```
+```
+â—¦ junit-jupiter-params
+```
+```
+â—¦ junit-jupiter-api
+```
+- All tests must be launchable by running mvn clean compile test command
+- Source code of the tested class must be fully covered in all implemented tests. Below
+    is an example of a full coverage demonstration with IntelliJ IDEA for Exercise 00:
 
 
 # Chapter IV
 
-# Exercise 00 : Models
+# Exercise 00 : First Tests
 
 ```
 Exercise 00
 ```
 ```
-Models
+First Tests
 Turn-in directory : ex 00 /
-Files to turn in : User.java, Transaction.java, Program.java
-Allowed functions :
-User classes can be employed, along with:
-Types (+ all methods of these types) : Integer, String, UUID, enumerations
+Files to turn in : Tests-folder
+Allowed functions : All
 ```
-Your first task is to develop basic domain modelsnamely, User and Transaction classes.
-It is quite likely for different users to have the same name in the system. This problem
-should be solved by adding a special field for a userâ€™s unique ID. This ID can be any
-integer number. Specific ID creation logic is described in the next exercise.
-Thus, the following set of states (fields) is typical for User class:
-
-- Identifier
-- Name
-- Balance
+Now you need to implement NumberWorker class that contains the following functionality:
 
 ```
-Transaction class describes a money transfer between two users. Here, a unique
-identifier should also be defined. Since the number of such transactions can be very
-large, let us define the identifier as an UUID string. Thus, the following set of states
-(fields) is typical for Transaction class:
+public boolean isPrime(int number) {
+...
+}
 ```
-- Identifier
-- Recipient (User type)
-- Sender (User type)
-- Transfer category (debits, credits)
-- Transfer amount
+This method determines if a number is prime and returns true/false for all natural
+(positive integer) numbers. For negative numbers, as well as 0 and 1, the program shall
+throw an unchecked exception. IllegalNumberException.
+
+```
+public int digitsSum(int number) {
+...
+}
+```
+This method returns the sum of digits of a source number.
+
+We also need to create NumberWorkerTest class that implements the module testing logic.
+Methods of NumberWorkerTest class shall check the correct operation of NumberWorker
+methods for various input data:
+
+1. isPrimeForPrimes method to check isPrime using prime numbers (at least three)
+2. isPrimeForNotPrimes method to check isPrime using composite numbers (at least
+three)
+3. isPrimeForIncorrectNumbers method to check isPrime using incorrect numbers (at
+least three)
+4. a method to check digitsSum using a set of at least 10 numbers
+
+Requirements:
 
 
-Module 01 â€“ Piscine Java OOP/Collections
+Module 06 â€“ Piscine Java JUnit/Mockito
 
-It is necessary to check the initial user balance (it cannot be negative), as well as the
-balance for the outgoing (negative amounts only) and incoming (positive amounts only)
-transactions (use of get/set methods).
-An example of use of such classes shall be contained in Program file (creation, initialization,
-printing object content on a console). All data for class fields must be hardcoded in
-Program.
+- NumberWorkerTest class must contain at least 4 methods to test NumberWorker
+    functionality
+- Use of @ParameterizedTest and @ValueSource is mandatory for methods 1â€“3.
+- Use of @ParameterizedTest and @CsvFileSource is mandatory for method 4.
+- You need to prepare data.csv file for method 4 where you shall specify at least 10
+    numbers and their correct sum of digits. A file content example:
+- 1234, 10
+
+Project structure:
+Tests
+src
+main
+java
+edu.school21.numbers
+NumberWorker
+resources
+test
+java
+edu.school21.numbers
+NumberWorkerTest
+resources
+data.csv
+pom.xml
 
 
 # Chapter V
 
-# Exercise 01 : ID Generator
+# Exercise 01 : Embedded DataBase
 
 ```
 Exercise 01
 ```
 ```
-ID Generator
+Embedded DataBase
 Turn-in directory : ex 01 /
-Files to turn in : UserIdsGenerator.java, User.java, Program.java
-Allowed functions : All permissions from the previous exercise can be used
+Files to turn in : Tests
+Allowed functions : All
 ```
-Make sure that each user ID is unique. To do so, create UserIdsGenerator class. Behavior
-of the object of this class defines the functionality for generating user IDs.
-State-of-the-art database management systems support autoincrement principle where
-each new ID is the value of the previously generated ID +1.
-So, UserIdsGenerator class contains the last generated ID as its state. UserIdsGenerator
-behavior is defined by int generateId() method that returns a newly generated ID each
-time it is called.
-An example of use of such classes shall be contained in Program file (creation, initialization,
-printing object content on a console).
-Notes:
+Do not use a heavy DBMS (like PostgreSQL) to implement integration testing of components
+that interact with the database. It is best to create a lightweight in-memory database
+with prearranged data.
 
-- Make sure only one UserIdsGenerator object exists (see the Singleton pattern). It
-    is required because existence of several objects of this class cannot guarantee that
-    all user identifiers are unique.
-- User identifier must be read-only since it is initialized only once (when the object
-    is created) and cannot be modified later during the program execution.
-- Temporary logic for identifier initialization should be added to User class construc-
-    tor:
+Implement DataSource creation mechanism for HSQL DBMS. To do so, connect spring-
+jdbc and hsqldb dependencies to the project. Prepare schema.sql and data.sql files where
+you will describe product table structure and test data (at least five).
 
-public User(...) {
-this. id = UserIdsGenerator.getInstance().generateId();
-}
+Product table structure:
 
+- identifier
+- name
+- price
+
+Also create EmbeddedDataSourceTest class. In this class, implement init() method marked
+with @BeforeEach annotation. In this class, implement functionality to create DataSource
+using EmbeddedDataBaseBuilder (a class in spring-jdbc library). Implement a simple test
+method to check the return value of getConnection() method created by DataSource (this
+value must not be null).
+
+Project structure:
+Tests
+src
+main
+java
+
+
+Module 06 â€“ Piscine Java JUnit/Mockito
+
+```
+edu.school21.numbers
+NumberWorker
+resources
+test
+java
+edu.school
+numbers
+NumberWorkerTest
+repositories
+EmbeddedDataSourceTest
+resources
+data.csv
+schema.sql
+data.sql
+pom.xml
+```
 
 # Chapter VI
 
-# Exercise 02 : List of Users
+# Exercise 02 : Test for JDBC Repository
 
 ```
 Exercise 02
 ```
 ```
-List of Users
+Test for JDBC Repository
 Turn-in directory : ex 02 /
-Files to turn in : UsersList.java, UsersArrayList.java, User.java,Program.java, etc.
-Allowed functions : All permissions from the previous exercise + throw can be used.
+Files to turn in : Tests
+Allowed functions : All
 ```
-Now we need to implement a functionality for storing users while the program runs.
-At the moment, your application has no persistent storage (such as a file system or
-a database). However, we want to avoid the dependence of your logic on user storage
-implementation method. To ensure more flexibility, let us define UsersList interface that
-describes the following behavior:
+Implement ProductsRepository/ProductsRepositoryJdbcImpl interface/class pair with
+the following methods:
 
-- Add a user
-- Retrieve a user by ID
-- Retrieve a user by index
-- Retrieve the number of users
+```
+List<Product> findAll()
+Optional<Product> findById(Long id)
+void update(Product product)
+void save(Product product)
+void delete(Long id)
+```
+You shall implement ProductsRepositoryJdbcImplTest class containing methods checking
+repository functionality using the in-memory database mentioned in the previous exercise.
+In this class, you should prepare in advance model objects that will be used for comparison
+in all tests.
+Example of declaring test data is given below:
 
-This interface will enable to develop the business logic of your application so that a
-specific storage implementation does not affect other system components.
-We shall also implement UsersArrayList class that implements UsersList interface.
-This class shall use an array to store user data. The default array size is 10. If the array
-is full, its size is increased by half. The user-adding method puts an object of User type
-in the first empty (vacant) cell of the array.
-In case of an attempt to retrieve a user with a non-existent ID, an unchecked UserNotFoundException
-must be thrown.
-An example of use of such classes shall be contained in Program file (creation, initialization,
-printing object content on a console).
-Note:
-Nested ArrayList<T> Java class has the same structure. By modeling behavior of this
-class on your own, you will learn how to use mechanisms of this standard library class.
+```
+class ProductsRepositoryJdbcImplTest {
+final List<Product> EXPECTED_FIND_ALL_PRODUCTS = ...;
+final Product EXPECTED_FIND_BY_ID_PRODUCT = ...;
+final Product EXPECTED_UPDATED_PRODUCT = ...;
+}
+```
+Notes:
+
+- Each test shall be isolated from behavior of other tests. Thus, the database must
+    be in its initial state before each test is run.
+- Test methods may call other methods that are not under the current test. For
+    instance, when testing update() method, findById() method may be called to check
+    the entity update validity in the database.
+
+
+Module 06 â€“ Piscine Java JUnit/Mockito
+
+Project structure:
+Tests
+src
+main
+java
+edu.school
+numbers
+NumberWorker
+models
+Product
+repositories
+ProductsRepository
+ProductsReposutoryJdbcImpl
+resources
+test
+java
+edu.school
+numbers
+NumberWorkerTest
+repositories
+EmbeddedDataSourceTest
+ProductsReposutoryJdbcImplTest
+resources
+data.csv
+schema.sql
+data.sql
+pom.xml
 
 
 # Chapter VII
 
-# Exercise 03 : List of transactions
+# Exercise 03 : Test for Service
 
 ```
 Exercise 03
 ```
 ```
-List of transactions
+Test for Service
 Turn-in directory : ex 03 /
-Files to turn in : TransactionsList.java, TransactionsLinkedList.java, User.java,
-Program.java, etc.
-Allowed functions : All permissions from the previous exercise can be used
+Files to turn in : Tests
+Allowed functions : All
 ```
-Unlike users, a list of transactions requires a special implementation approach. Since the
-number of transaction creation operations can be very large, we need a storage method
-to avoid a costly array size extension.
-In this task, we offer you to create TransactionsListinterface describing the following
-behavior:
+An important rule for module tests: an individual system component shall be tested
+without calling its dependenciesâ€™ functionality. This approach allows developers to create
+and test components independently, as well as postpone the implementation of specific
+application parts.
 
-- Add a transaction
-- Remove a transaction by ID (in this case, UUID string identifier is used)
-- Transform into array (ex. Transaction[] toArray())
+Now you need to implement the business logic layer represented by UsersServiceImpl class.
+This class contains a user authentication logic. It also has a dependency on UsersRepository
+interface (in this task, you do not need to implement this interface).
 
-```
-A list of transactions shall be implemented as a linked list (LinkedList)
-in TransactionsLinkedList class. Therefore, each transaction shall contain a field
-with a link to the next transaction object.
-If an attempt is made to remove a transaction with non-existent ID,
-TransactionNotFoundException runtime exception must be thrown.
-An example of use of such classes shall be contained in Program file (creation,
-initialization, printing object content on a console).
-```
-```
-Note:
-```
-- We need to add transactions field of TransactionsList type to User class so that
-    each user can store the list of their transactions.
-- A transaction must be added with a SINGLE operation (O(1))
-- LinkedList<T> nested Java class has the same structure, a bidirectional linked list.
-
-
-# Chapter VIII
-
-# Exercise 04 : Business Logic
+UsersRepository interface (that you have described) shall contain the following methods:
 
 ```
-Exercise 04
+User findByLogin(String login);
+void update(User user);
 ```
-```
-Business Logic
-Turn-in directory : ex 04 /
-Files to turn in : TransactionsService.java, Program.java, etc.
-Allowed functions : All permissions from the previous exercise can be used
-```
-The business logic level of the application is located in service classes. Such classes
-contain basic algorithms of the system, automated processes, etc. These classes are usually
-designed based on the Facade pattern that can encapsulate behavior of several classes.
-In this case, TransactionsService class must contain a field of UsersList type for user
-interactions and provide the following functionality:
+It is assumed that findByLogin method returns a Userobject found via login, or throws
+EntityNotFoundException if no user is found with the login specified. Update method
+throws a similar exception when updating a user that does not exist in the database.
 
-- Adding a user
-- Retrieving a userâ€™s balance
-- Performing a transfer transaction (user IDs and transfer amount are specified). In
-    this case, two transactions of DEBIT/CREDIT types are created and added to
-    recipient and sender. IDs of both transactions must be equal
-- Retrieving transfers of a specific user (an ARRAY of transfers is returned). Re-
-    moving a transaction by ID for a specific user (transaction ID and user ID are
-    specified)
-- Check validity of transactions (returns an ARRAY of unpaired transactions).
+User entity shall contain the following fields:
 
-In case of an attempt to make a transfer of the amount exceeding userâ€™s residual balance,
-IllegalTransactionException runtime exception must be thrown.
-An example of use of such classes shall be contained in Program file (creation, initialization,
-printing object content on a console).
+- Identifier
+- Login
+- Password
+- Authentication success status (true - authenticated, false - not authenticated)
 
 
-# Chapter IX
+Module 06 â€“ Piscine Java JUnit/Mockito
 
-# Exercise 05 : Menu
+In turn, UsersServiceImpl class calls these methods inside the authentication function:
 
-```
-Exercise 05
-```
-```
-Menu
-Turn-in directory : ex 05 /
-Files to turn in : Menu.java, Program.java, etc.
-Allowed functions : All permissions from the previous exercise can be used, as well as
-try/catch
-```
-- As a result, you should create a functioning application with a console
-- menu. Menu functionality must be implemented in the respective class with a link
-    field to TransactionsService.
-- Each menu item must be accompanied by the number of the command entered by
-    a user to call an action.
-- The application shall support two launch modesproduction (standard mode) and
-    dev (where transfer information for a specific user can be removed by user ID, and
-    a function that checks the validity of all transfers can be run).
-- If an exception is thrown, a message containing information about the error shall
-    appear, and user shall be provided an ability to enter valid data.
-- The application operation scenario is as follows (the program must carefully follow
-    this output example):
+boolean authenticate(String login, String password)
 
-```
-$ java Program --profile=dev
-```
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 1
-Enter a user name and a balance
--> Jonh 777
+This method:
+
+1. Checks if a user has been authenticated in the system using this login. If authentication
+was performed, AlreadyAuthenticatedException must be thrown.
+2. The user with this login is retrieved from UsersRepository.
+3. If the retrieved user password matches the specified password, the method sets the
+status of the authentication success for the user, updates its information in the database
+and returns true. If passwords mismatch, the method returns false.
+Your goal is to:
+1. Create UsersRepository interface
+2. Create UsersServiceImpl class and authenticate method
+3. Create a module test for UsersServiceImpl class
+
+Since your objective is to check correct operation of authenticate method independently
+of UsersRepository component, you should use mock object and stubs of findByLogin
+and update methods (see Mockito library).
+
+Authenticate method shall be checked for three cases:
+
+1. Correct login/password (check calling update method using verify instruction of Mockito
+library)
+2. Incorrect login
+3. Incorrect password
+
+Project structure:
+Tests
+src
+main
+java
+edu.school
+exceptions
+AlreadyAuthenticatedException
+numbers
+NumberWorker
+models
+Product
+User
+services
+UsersServiceImpl
+repositories
+ProductsRepository
+ProductsReposutoryJdbcImpl
+UsersRepository
+resources
+test
 
 
-Module 01 â€“ Piscine Java OOP/Collections
+Module 06 â€“ Piscine Java JUnit/Mockito
 
 ```
-User with id = 1 is added
----------------------------------------------------------
+java
+edu.school
+services
+UsersServiceImplTest
+numbers
+NumberWorkerTest
+repositories
+EmbeddedDataSourceTest
+ProductsReposutoryJdbcImplTest
+resources
+data.csv
+schema.sql
+data.sql
+pom.xml
 ```
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 1
-Enter a user name and a balance
--> Mike 100
-User with id = 2 is added
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 3
-Enter a sender ID, a recipient ID, and a transfer amount
--> 1 2 100
-The transfer is completed
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 3
-Enter a sender ID, a recipient ID, and a transfer amount
--> 1 2 150
-The transfer is completed
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 3
-Enter a sender ID, a recipient ID, and a transfer amount
--> 1 2 50
-The transfer is completed
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 2
-Enter a user ID
--> 2
-Mike - 400
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 4
-Enter a user ID
--> 1
-To Mike(id = 2) -100 with id = cc128842-2e5c-4cca-a44c-7829f53fc31f
-
-
-Module 01 â€“ Piscine Java OOP/Collections
-
-```
-To Mike(id = 2) -150 with id = 1fc852e7-914f-4bfd-913d-0313aab1ed
-TO Mike(id = 2) -50 with id = ce183f49-5be9-4513-bd05-8bd82214eaba
----------------------------------------------------------
-```
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 5
-Enter a user ID and a transfer ID
--> 1 1fc852e7-914f-4bfd-913d-0313aab1ed
-Transfer To Mike(id = 2) 150 removed
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 6
-Check results:
-Mike(id = 2) has an unacknowledged transfer id = 1fc852e7-914f-4bfd-913d-0313aab1ed99 from John(id = 1) for 150
-
