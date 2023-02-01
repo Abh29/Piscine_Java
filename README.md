@@ -24,3 +24,8 @@ Summary: Today you will learn how to use basic multithreading mechanisms in Java
 Summary: Today you will learn to create library archives and use external libraries
 
 
+## Day_05: SQL/JDBC
+
+Summary: Today you will use the key mechanisms to work with PostgreSQL DBMS via
+JDBC
+
