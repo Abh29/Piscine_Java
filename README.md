@@ -40,3 +40,7 @@ Summary: Today you will develop your own frameworks that use the reflection
 mechanism
 
 
+## Day_08: Sockets
+
+Summary: Today you will implement the basic mechanism of a client/server application
+based on JavaSockets API
