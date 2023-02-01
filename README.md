@@ -1,47 +1,59 @@
-# Module 01 â€“ Piscine Java
+# Module 05 â€“ Piscine Java
 
-## OOP/Collections
+## SQL/JDBC
 
-Summary: Today you will learn how to model the operation of various collections
-correctly, and create a full-scale money transfer application
+Summary: Today you will use the key mechanisms to work with PostgreSQL DBMS via
+JDBC
 
 
 ## Contents
 
 - I Foreword
 - II Instructions
-- III Introduction to exercises
-- IV Exercise 00 : Models
-- V Exercise 01 : ID Generator
-- VI Exercise 02 : List of Users
-- VII Exercise 03 : List of transactions
-- VIII Exercise 04 : Business Logic
-- IX Exercise 05 : Menu
+- III Rules of the Day
+- IV Exercise 00 : Tables and Entities
+- V Exercise 01 : Read/Find
+- VI Exercise 02 : Create/Save
+- VII Exercise 03 : Update
+- VIII Exercise 04 : Find All
 
 
 # Chapter I
 
 # Foreword
 
-Domain modeling is the most challenging task in software development. Solving this task
-correctly ensures flexibility of the implemented system.
-Programming languages supporting the object-oriented programming (OOP) concept
-enable to effectively divide business processes into logical components called classes.
-Each class must comply with SOLID principles:
+As you know, relational databases consist of a set of linked tables. Each table has a set
+of rows and columns. If there is a huge number of rows in a table, searching data with a
+specific value in the column may obviously take a lot of time.
 
-- Single responsibility principle: a class contains a single logically associated func-
-    tionality (a coffee machine cannot clean and monitor changes in the call stack; its
-    purpose is to make coffee).
-- Open-closed principle: each class can offer an option to extend its functionality.
-    However, such extension should not provide for modifying source class code.
-- Liskov substitution principle: derived classes only ADD to the functionality of a
-    source class without modifying it.
-- Interface segregation principle: there are many points (interfaces) that describe a
-    logically associated behavior. There is no general-purpose interface.
-- Dependency inversion principle: a system must not depend on specific entities; all
-    dependencies are based on abstractions (interfaces).
+To solve this problem, up-to-date DBMS use an index mechanism. BTree data structure
+is an implementation of index concept.
 
-Today, you should focus on the first SOLID principle.
+This index may be used for a column of a table. Since a tree is always balanced, searching
+for any value takes the same amount of time.
+
+Rules that substantially expedite a search are as follows:
+
+- Keys in each node are ordered.
+- Root contains 1 to t-1 keys.
+- Any other node contains t-1 to 2t-1 keys.
+- If a node contains k1, k2, ... kn keys, it has n+1 derived classes.
+- The first derived class and all its derived classes contain keys that are less than or
+    equal to k1.
+- The last derived class and all its derived classes contain keys that are greater than
+    or equal to kn.
+
+
+Module 05 â€“ Piscine Java SQL/JDBC
+
+- For 2 <= i <= n, i-th derived class and all its derived classes contain keys in the
+    (ki-1, ki) range.
+
+Therefore, to search for a value, you just need to determine which derived class to go
+down to. This allows to avoid looking through the entire table.
+
+This approach apparently has a lot of specifics. For example, if new values constantly go
+into a table, DBMS will always rebuild the index which will slow down the system.
 
 
 # Chapter II
@@ -76,7 +88,7 @@ Today, you should focus on the first SOLID principle.
 - Use "System.out" for output
 
 
-Module 01 â€“ Piscine Java OOP/Collections
+Module 05 â€“ Piscine Java SQL/JDBC
 
 - And may the Force be with you!
 - Never leave that till tomorrow which you can do today ;)
@@ -84,378 +96,288 @@ Module 01 â€“ Piscine Java OOP/Collections
 
 # Chapter III
 
-# Introduction to exercises
+# Rules of the Day
 
-An internal money transfer system is an integral part of many corporate applications.
-Your todayâ€™s task is to automate a business process associated with transfers of certain
-amounts between participants of our system.
-Each system user can transfer a certain amount to another user. We need to make sure
-that even if we lose the history of incoming and outgoing transfers for a specific user, we
-shall still be able to recover this information.
-Inside the system, all money transactions are stored in the form of debit/credit pairs.
-For example, John has transferred \$500 to Mike. System saves the transaction for both
-users:
-John -> Mike, -500, OUTCOME, transaction ID
-Mike -> John, +500, INCOME, transaction ID
-To recover the connection within such pairs, identifiers of each transaction should be
-used.
-A transfer entry may obviously be lost in such a complex systemit may not be recorded
-for one of the users (to emulate and debug such a situation, a developer needs to be able to
-remove the transfer data from one of users individually). Since such situations are realistic,
-functionality is required for displaying all "unacknowledged transfers" (transactions recorded
-for one user only) and resolving such issues.
-Below is a set of exercises you can do one by one to solve the task.
+- Use the PostgreSQL DBMS in all tasks.
+- Connect the up-to-date version of JDBC driver.
+- To interact with the database, you may use classes and interfaces of the java.sql
+    package (implementations of corresponding interfaces will be automatically included
+    from the archive containing the driver).
 
 
 # Chapter IV
 
-# Exercise 00 : Models
+# Exercise 00 : Tables and Entities
 
 ```
 Exercise 00
 ```
 ```
-Models
+Tables and Entities
 Turn-in directory : ex 00 /
-Files to turn in : User.java, Transaction.java, Program.java
-Allowed functions :
-User classes can be employed, along with:
-Types (+ all methods of these types) : Integer, String, UUID, enumerations
+Files to turn in : Chat-folder
+Allowed functions : n/a
 ```
-Your first task is to develop basic domain modelsnamely, User and Transaction classes.
-It is quite likely for different users to have the same name in the system. This problem
-should be solved by adding a special field for a userâ€™s unique ID. This ID can be any
-integer number. Specific ID creation logic is described in the next exercise.
-Thus, the following set of states (fields) is typical for User class:
+Throughout this week, we will be implementing Chat functionality. In this chat, user can
+create or choose an existing chatroom. Each chatroom can have several users exchanging
+messages.
+Key domain models which both SQL tables and Java classes must be implemented for
+are:
+User
+User ID
+Login
+Password
+List of created rooms
+List of chatrooms where a user socializes
+Chatroom
+Chatroom id
+Chatroom name
+Chatroom owner
+List of messages in a chatroom
+Message
+Message id
+Message author
+Message room
+Message text
+Message date/time
 
-- Identifier
-- Name
-- Balance
+Create schema.sql file where you will describe CREATE TABLE operations to create
+tables for the project. You should also create data.sql file with text data INSERTS (at
+least five in each table).
+
+
+Module 05 â€“ Piscine Java SQL/JDBC
+
+It is important to meet the following requirement!
+
+Letâ€™s assume that Course entity has a one-to-many relationship with Lesson entity. Their
+object-oriented relation should then look as follows:
 
 ```
-Transaction class describes a money transfer between two users. Here, a unique
-identifier should also be defined. Since the number of such transactions can be very
-large, let us define the identifier as an UUID string. Thus, the following set of states
-(fields) is typical for Transaction class:
+class Course {
+private Long id;
+private List<Lesson> lessons;// there are numerous lessons in the course
+...
+}
+class Lesson {
+private Long id;
+private Course course; // the lesson contains a course it is linked to
+...
+}
 ```
-- Identifier
-- Recipient (User type)
-- Sender (User type)
-- Transfer category (debits, credits)
-- Transfer amount
+Additional requirements:
 
+- To implement relational links, use one-to-many and many-to-many link types.
+- Identifiers should be numeric.
+- Identifiers shall be generated by DBMS.
+- equals(), hashCode() and toString() shall be redefined correctly inside Java classes.
 
-Module 01 â€“ Piscine Java OOP/Collections
-
-It is necessary to check the initial user balance (it cannot be negative), as well as the
-balance for the outgoing (negative amounts only) and incoming (positive amounts only)
-transactions (use of get/set methods).
-An example of use of such classes shall be contained in Program file (creation, initialization,
-printing object content on a console). All data for class fields must be hardcoded in
-Program.
+Exercise project structure:
+Chat
+src
+main
+java
+edu.school21.chat
+models - domain knowledge models
+resources
+schema.sql
+data.sql
+pom.xml
 
 
 # Chapter V
 
-# Exercise 01 : ID Generator
+# Exercise 01 : Read/Find
 
 ```
 Exercise 01
 ```
 ```
-ID Generator
+Read/Find
 Turn-in directory : ex 01 /
-Files to turn in : UserIdsGenerator.java, User.java, Program.java
-Allowed functions : All permissions from the previous exercise can be used
+Files to turn in : Chat-folder
+Allowed functions : n/a
 ```
-Make sure that each user ID is unique. To do so, create UserIdsGenerator class. Behavior
-of the object of this class defines the functionality for generating user IDs.
-State-of-the-art database management systems support autoincrement principle where
-each new ID is the value of the previously generated ID +1.
-So, UserIdsGenerator class contains the last generated ID as its state. UserIdsGenerator
-behavior is defined by int generateId() method that returns a newly generated ID each
-time it is called.
-An example of use of such classes shall be contained in Program file (creation, initialization,
-printing object content on a console).
-Notes:
+Data Access Object (DAO, Repository) is a popular design pattern that allows to separate
+key business logic from data handling logic in an application.
 
-- Make sure only one UserIdsGenerator object exists (see the Singleton pattern). It
-    is required because existence of several objects of this class cannot guarantee that
-    all user identifiers are unique.
-- User identifier must be read-only since it is initialized only once (when the object
-    is created) and cannot be modified later during the program execution.
-- Temporary logic for identifier initialization should be added to User class construc-
-    tor:
+Letâ€™s assume that we have an interface called CoursesRepository which provides access
+to course lessons. This interface may look as follows:
 
-public User(...) {
-this. id = UserIdsGenerator.getInstance().generateId();
+```
+public interface CoursesRepository {
+Optional<Course> findById(Long id);
+void delete(Course course);
+void save(Course course);
+void update(Course course);
+List<Course> findAll();
 }
+```
+You need to implement MessagesRepository with a SINGLE Optional<Message> findById(Long
+id) method and its MessagesRepositoryJdbcImpl implementation.
+
+This method shall return a Message object where author and chatroom will be specified.
+In turn, there is NO NEED to enter subentities (list of chatrooms, chatroom creator,
+etc.) for the author and the chatroom.
+
+The implemented code must be tested in Program.java class. Example of the program
+operation is as follows (the output may differ):
+
+```
+$ java Program
+Enter a message ID
+-> 5
+Message : {
+id=5,
+author={id=7,login="user",password="user",createdRooms=null,rooms=null},
+```
+
+Module 05 â€“ Piscine Java SQL/JDBC
+
+```
+room={id=8,name="room",creator=null,messages=null},
+text="message",
+dateTime=01/01/01 15:
+}
+```
+Exercise project structure:
+Chat
+src
+main
+java
+edu.school21.chat
+models - domain knowledge models
+repositories - repositories
+app
+Program.java
+resources
+schema.sql
+data.sql
+pom.xml
+
+- MessagesRepositoryJdbcImpl shall accept DataSource interface of java.sql package
+    as a constructor parameter.
+- For DataSource implementation, use HikariCP librarya pool of connections to the
+    database which considerably expedite the use of storage.
 
 
 # Chapter VI
 
-# Exercise 02 : List of Users
+# Exercise 02 : Create/Save
 
 ```
 Exercise 02
 ```
 ```
-List of Users
+Create/Save
 Turn-in directory : ex 02 /
-Files to turn in : UsersList.java, UsersArrayList.java, User.java,Program.java, etc.
-Allowed functions : All permissions from the previous exercise + throw can be used.
+Files to turn in : Chat-folder
+Allowed functions : n/a
 ```
-Now we need to implement a functionality for storing users while the program runs.
-At the moment, your application has no persistent storage (such as a file system or
-a database). However, we want to avoid the dependence of your logic on user storage
-implementation method. To ensure more flexibility, let us define UsersList interface that
-describes the following behavior:
+Now you need to implement save(Message message) method for MessagesRepository.
 
-- Add a user
-- Retrieve a user by ID
-- Retrieve a user by index
-- Retrieve the number of users
+Thus, we need to define the following subentities for the entity we are savinga message
+author and a chatroom. It is also important to assign IDs that exist in the database to
+chatroom and author.
 
-This interface will enable to develop the business logic of your application so that a
-specific storage implementation does not affect other system components.
-We shall also implement UsersArrayList class that implements UsersList interface.
-This class shall use an array to store user data. The default array size is 10. If the array
-is full, its size is increased by half. The user-adding method puts an object of User type
-in the first empty (vacant) cell of the array.
-In case of an attempt to retrieve a user with a non-existent ID, an unchecked UserNotFoundException
-must be thrown.
-An example of use of such classes shall be contained in Program file (creation, initialization,
-printing object content on a console).
-Note:
-Nested ArrayList<T> Java class has the same structure. By modeling behavior of this
-class on your own, you will learn how to use mechanisms of this standard library class.
+Example of save method use:
+
+```
+public static void main(String args[]) {
+...
+User creator = new User(7L, "user", "user", new ArrayList(), new ArrayList());
+User author = creator;
+Room room = new Room(8L, "room", creator, new ArrayList());
+Message message = new Message(null, author, room, "Hello!", LocalDateTime.now());
+MessagesRepository messagesRepository = new MessagesRepositoryJdbcImpl(...);
+messagesRepository.save(message);
+System.out.println(message.getId()); // ex. id == 11
+}
+```
+- So, save method shall assign ID value for the incoming model after saving data in
+    the database.
+- If author and room have no ID existing in the database assigned, or these IDs
+    are null, throw Runtimeexception NotSavedSubEntityException (implement this
+    exception on your own).
+- Test the implemented code in Program.java class.
 
 
 # Chapter VII
 
-# Exercise 03 : List of transactions
+# Exercise 03 : Update
 
 ```
 Exercise 03
 ```
 ```
-List of transactions
+Update
 Turn-in directory : ex 03 /
-Files to turn in : TransactionsList.java, TransactionsLinkedList.java, User.java,
-Program.java, etc.
-Allowed functions : All permissions from the previous exercise can be used
+Files to turn in : Chat-folder
+Allowed functions : n/a
 ```
-Unlike users, a list of transactions requires a special implementation approach. Since the
-number of transaction creation operations can be very large, we need a storage method
-to avoid a costly array size extension.
-In this task, we offer you to create TransactionsListinterface describing the following
-behavior:
+Now we need to implement update method in MessageRepository. This method shall
+fully update an existing entity in the database. If a new value of a field in an entity being
+updated is null, this value shall be saved in the database.
 
-- Add a transaction
-- Remove a transaction by ID (in this case, UUID string identifier is used)
-- Transform into array (ex. Transaction[] toArray())
+An example of update method use:
 
 ```
-A list of transactions shall be implemented as a linked list (LinkedList)
-in TransactionsLinkedList class. Therefore, each transaction shall contain a field
-with a link to the next transaction object.
-If an attempt is made to remove a transaction with non-existent ID,
-TransactionNotFoundException runtime exception must be thrown.
-An example of use of such classes shall be contained in Program file (creation,
-initialization, printing object content on a console).
+public static void main(String args[]) {
+MessagesRepository messagesRepository = new MessagesRepositoryJdbcImpl(...);
+Optional<Message> messageOptional = messagesRepository.findById(11);
+if (messageOptinal.isPresent()) {
+Message message = messageOptional.get();
+message.setText("Bye");
+message.setDateTime(null);
+messagesRepository.update(message);
+}
+...
+}
 ```
-```
-Note:
-```
-- We need to add transactions field of TransactionsList type to User class so that
-    each user can store the list of their transactions.
-- A transaction must be added with a SINGLE operation (O(1))
-- LinkedList<T> nested Java class has the same structure, a bidirectional linked list.
+- In this example, the value of the column storing the message text will be altered,
+    whereas message time will be null.
 
 
 # Chapter VIII
 
-# Exercise 04 : Business Logic
+# Exercise 04 : Find All
 
 ```
 Exercise 04
 ```
 ```
-Business Logic
+Find All
 Turn-in directory : ex 04 /
-Files to turn in : TransactionsService.java, Program.java, etc.
-Allowed functions : All permissions from the previous exercise can be used
+Files to turn in : Chat-folder
+Allowed functions : n/a
 ```
-The business logic level of the application is located in service classes. Such classes
-contain basic algorithms of the system, automated processes, etc. These classes are usually
-designed based on the Facade pattern that can encapsulate behavior of several classes.
-In this case, TransactionsService class must contain a field of UsersList type for user
-interactions and provide the following functionality:
+Now you need to implement UsersRepository interface and UsersRepositoryJdbcImpl
+class using a SINGLE List<User> findAll(int page, int size) method.
 
-- Adding a user
-- Retrieving a userâ€™s balance
-- Performing a transfer transaction (user IDs and transfer amount are specified). In
-    this case, two transactions of DEBIT/CREDIT types are created and added to
-    recipient and sender. IDs of both transactions must be equal
-- Retrieving transfers of a specific user (an ARRAY of transfers is returned). Re-
-    moving a transaction by ID for a specific user (transaction ID and user ID are
-    specified)
-- Check validity of transactions (returns an ARRAY of unpaired transactions).
+This method shall return sizeusers shown in the page with page number. This "piecewise"
+data retrieval is called pagination. Thus, DBMS divides the overall set into pages each
+containing size entries. For example, if a set contains 20 entries with page = 3 and size
+= 4 , you retrieve users 12 to 15 (user and page numbering starts from 0).
 
-In case of an attempt to make a transfer of the amount exceeding userâ€™s residual balance,
-IllegalTransactionException runtime exception must be thrown.
-An example of use of such classes shall be contained in Program file (creation, initialization,
-printing object content on a console).
+The most complicated situation in converting relational links into object-oriented links
+happens when you retrieve a set of entities along with their subentities. In this task, each
+user in the resulting list shall have included dependenciesa list of chatrooms created by
+that user, as well as a list of chatrooms the user participates in.
 
+Each subentity of the user MUST NOT include its dependencies, i.e. list of messages
+inside each room must be empty.
 
-# Chapter IX
+The implemented method operation should be demonstrated in Program.java.
 
-# Exercise 05 : Menu
+Notes
 
-```
-Exercise 05
-```
-```
-Menu
-Turn-in directory : ex 05 /
-Files to turn in : Menu.java, Program.java, etc.
-Allowed functions : All permissions from the previous exercise can be used, as well as
-try/catch
-```
-- As a result, you should create a functioning application with a console
-- menu. Menu functionality must be implemented in the respective class with a link
-    field to TransactionsService.
-- Each menu item must be accompanied by the number of the command entered by
-    a user to call an action.
-- The application shall support two launch modesproduction (standard mode) and
-    dev (where transfer information for a specific user can be removed by user ID, and
-    a function that checks the validity of all transfers can be run).
-- If an exception is thrown, a message containing information about the error shall
-    appear, and user shall be provided an ability to enter valid data.
-- The application operation scenario is as follows (the program must carefully follow
-    this output example):
-
-```
-$ java Program --profile=dev
-```
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 1
-Enter a user name and a balance
--> Jonh 777
+- findAll(int page, int size) method shall be implemented by a SINGLE database
+    query. It is not allowed to use additional SQL queries to retrieve information for
+    each user.
+- We recommend using CTE PostgreSQL.
 
 
-Module 01 â€“ Piscine Java OOP/Collections
+Module 05 â€“ Piscine Java SQL/JDBC
 
-```
-User with id = 1 is added
----------------------------------------------------------
-```
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 1
-Enter a user name and a balance
--> Mike 100
-User with id = 2 is added
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 3
-Enter a sender ID, a recipient ID, and a transfer amount
--> 1 2 100
-The transfer is completed
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 3
-Enter a sender ID, a recipient ID, and a transfer amount
--> 1 2 150
-The transfer is completed
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 3
-Enter a sender ID, a recipient ID, and a transfer amount
--> 1 2 50
-The transfer is completed
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 2
-Enter a user ID
--> 2
-Mike - 400
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 4
-Enter a user ID
--> 1
-To Mike(id = 2) -100 with id = cc128842-2e5c-4cca-a44c-7829f53fc31f
-
-
-Module 01 â€“ Piscine Java OOP/Collections
-
-```
-To Mike(id = 2) -150 with id = 1fc852e7-914f-4bfd-913d-0313aab1ed
-TO Mike(id = 2) -50 with id = ce183f49-5be9-4513-bd05-8bd82214eaba
----------------------------------------------------------
-```
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 5
-Enter a user ID and a transfer ID
--> 1 1fc852e7-914f-4bfd-913d-0313aab1ed
-Transfer To Mike(id = 2) 150 removed
----------------------------------------------------------
-1. Add a user
-2. View user balances
-3. Perform a transfer
-4. View all transactions for a specific user
-5. DEV - remove a transfer by ID
-6. DEV - check transfer validity
-7. Finish execution
--> 6
-Check results:
-Mike(id = 2) has an unacknowledged transfer id = 1fc852e7-914f-4bfd-913d-0313aab1ed99 from John(id = 1) for 150
-
+- UsersRepositoryJdbcImpl shall accept DataSource interface of java.sql package as
+    a constructor parameter.
