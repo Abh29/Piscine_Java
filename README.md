@@ -29,3 +29,9 @@ Summary: Today you will learn to create library archives and use external librar
 Summary: Today you will use the key mechanisms to work with PostgreSQL DBMS via
 JDBC
 
+## Day_06: JUnit/Mockito
+
+Summary: Today you will learn the basics of module and integration testing
+
+
+
