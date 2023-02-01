@@ -34,4 +34,9 @@ JDBC
 Summary: Today you will learn the basics of module and integration testing
 
 
+## Day_07: Reflection
+
+Summary: Today you will develop your own frameworks that use the reflection
+mechanism
+
 
