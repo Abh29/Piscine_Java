@@ -12,3 +12,10 @@ correctly, and create a full-scale money transfer application
 
 Summary: Today you will learn how to use input/output in Java and implement
 programs to manipulate a file system
+
+
+## Day_03: Threads
+
+Summary: Today you will learn how to use basic multithreading mechanisms in Java
+
+
