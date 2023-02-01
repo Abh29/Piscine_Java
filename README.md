@@ -51,3 +51,8 @@ based on JavaSockets API
 Summary: Today you will implement quite a complicated game business process using
 Maven build tool
 
+
+## Rush_02: Java FX & Sockets
+
+Summary: Today you will implement an actual client/server game with a full-scale
+interface
