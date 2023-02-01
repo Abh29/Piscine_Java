@@ -44,3 +44,10 @@ mechanism
 
 Summary: Today you will implement the basic mechanism of a client/server application
 based on JavaSockets API
+
+
+## Rush_00: Console Game & Maven
+
+Summary: Today you will implement quite a complicated game business process using
+Maven build tool
+
